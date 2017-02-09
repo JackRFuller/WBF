@@ -7,54 +7,53 @@ public class PlayerCombatState : BaseMonoBehaviour
     [SerializeField]
     private Animator pcAnimator;
 
-    private bool allowInput;
+    private bool allowInput = false;
 
     int combatCount = 0;
+    int maxCombatCount = 1;
 
 
     public IEnumerator BeginStandardAttacks()
     {
         //First Attack
-        allowInput = false;
-        pcAnimator.SetTrigger("Standard Attack 1");
-        yield return StartCoroutine(AttackCooldown(0.5f));
-
-        //Wait for Second Attack Input
         allowInput = true;
-        yield return StartCoroutine(AttackCooldown(0.5f));
+        combatCount = 1;
+        maxCombatCount = 2;
+        pcAnimator.SetBool("isAttacking", true);
+        pcAnimator.SetInteger("Attack Count", combatCount);
+        yield return StartCoroutine(AttackCooldown(1f));
 
-        if (combatCount == 0)
+        if (combatCount < maxCombatCount)
         {
             ReturnToIdle();
         }
         else
         {
-            pcAnimator.SetTrigger("Standard Attack 2");
-            yield return StartCoroutine(AttackCooldown(0.5f));
+            maxCombatCount = 3;
+            pcAnimator.SetInteger("Attack Count", combatCount);
+            yield return StartCoroutine(AttackCooldown(1.5f));   
 
-            allowInput = true;
-            yield return StartCoroutine(AttackCooldown(0.5f));
-
-            if (combatCount == 1)
+            if (combatCount < maxCombatCount)
             {
                 ReturnToIdle();
             }
             else
             {
-                pcAnimator.SetTrigger("Standard Attack 3");
-                yield return StartCoroutine(AttackCooldown(1f));
-
-                combatCount = 0;
-                allowInput = false;
-
+                Debug.Log("Three");
+                pcAnimator.SetInteger("Attack Count", combatCount);
+                yield return StartCoroutine(AttackCooldown(1.75f));
                 ReturnToIdle();
             }
         }
-            
+    }
 
-
-
-       
+    public IEnumerator JumpAttack()
+    {
+        Debug.Log("Started");
+        pcAnimator.SetBool("isAttacking", true);
+        yield return StartCoroutine(AttackCooldown(3f));
+        ReturnToIdle();
+        Debug.Log("Finsihed");
     }
 
     private IEnumerator AttackCooldown(float timer)
@@ -69,12 +68,13 @@ public class PlayerCombatState : BaseMonoBehaviour
 
     private void CheckForAttackInput()
     {
-        if(allowInput)
+        if (allowInput)
         {
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButtonDown(0))
             {
                 combatCount++;
-                allowInput = false;
+                pcAnimator.SetInteger("Attack Count", combatCount);
+                //allowInput = false;
             } 
         }
     }
@@ -82,6 +82,11 @@ public class PlayerCombatState : BaseMonoBehaviour
     private void ReturnToIdle()
     {
         //Return to Idle
+        allowInput = false;
+        combatCount = 0;
+        maxCombatCount = 1;
+        pcAnimator.SetBool("isAttacking", false);
+        pcAnimator.SetInteger("Attack Count", combatCount);
         EventManager.TriggerEvent(Events.ReturnToIdle);
     }
 }

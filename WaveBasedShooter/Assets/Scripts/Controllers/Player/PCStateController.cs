@@ -94,7 +94,7 @@ public class PCStateController : BaseMonoBehaviour
     void Init()
     {
         playerState = PlayerState.Moving;
-        pcController = this.GetComponent<CharacterController>();
+        //pcController = this.GetComponent<CharacterController>();
         currentState = idleState;
     }
 
@@ -114,17 +114,23 @@ public class PCStateController : BaseMonoBehaviour
         //    currentState = rollState;
         //}
 
-        if(Input.GetMouseButtonDown(0))
-        {
-            if(currentState != rollState)
+        if (currentState != rollState)
+        { 
+            if (Input.GetMouseButtonDown(0) && Input.GetMouseButton(1))
+            {
+                StartCoroutine(combatState.JumpAttack());
+                playerState = PlayerState.Combat;
+                return;
+            }
+            else if (Input.GetMouseButtonDown(0))
             {
                 StartCoroutine(combatState.BeginStandardAttacks());
                 playerState = PlayerState.Combat;
+                return;                
             }
-           
         }
 
-        if(Input.GetKey(KeyCode.LeftShift))
+        if(Input.GetMouseButton(1))
         {
             pcAnimator.SetBool("isSprinting", true);
         }

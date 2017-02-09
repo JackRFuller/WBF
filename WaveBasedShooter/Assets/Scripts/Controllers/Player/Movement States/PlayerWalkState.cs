@@ -40,7 +40,7 @@ public class PlayerWalkState : IPlayerState
     private void MovePlayableCharacter()
     {
         //Check for Rolling
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space))
         {
             ToRollState();
             return;
@@ -62,17 +62,13 @@ public class PlayerWalkState : IPlayerState
         {
             float speed = player.MovementSpeed;
 
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                speed = 6f;
-            }
-
             Vector3 movementDirection = PCStateController.InputDirection * speed;
+            Vector3 movementDir = player.transform.TransformDirection(movementDirection);
 
             if (movementDirection != Vector3.zero)
                 player.transform.rotation = Quaternion.LookRotation(movementDirection);
 
-            player.PCController.Move(movementDirection * Time.deltaTime);
+            //player.PCController.Move(movementDirection * Time.deltaTime);
         }
     }
 }

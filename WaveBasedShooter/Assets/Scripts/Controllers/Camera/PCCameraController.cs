@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PCCameraController : BaseMonoBehaviour
 {
-    public CharacterController target;
+    public Collider target;
     public Vector3 focusAreaSize;
     private FocusArea focusArea;
     public Vector3 cameraOffset;
@@ -95,8 +95,8 @@ public class PCCameraController : BaseMonoBehaviour
 
     public void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawCube(focusArea.center, focusAreaSize);
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawCube(focusArea.center, focusAreaSize);
     }
 
     struct FocusArea

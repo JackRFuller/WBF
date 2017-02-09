@@ -60,52 +60,26 @@ public class PlayerRollState : IPlayerState
 
     private void InitiateRoll()
     {
-        //Check if we Can Roll
-        if(!canRoll)
-        {
-
-        }
-
         player.PCAnimator.SetTrigger("Roll");
-        player.PCController.enabled = false;
-
-        startPosition = player.transform.position;
-
-        //Work out Target Position        
-        endPosition = startPosition + (player.transform.forward * distanceAheadofPlayer); 
-        timeStartedRolling = Time.time;
         rollingState = RollingState.started;
-       
+
     }
 
     private void RollPlayer()
     {
-        float timeSinceStarted = Time.time - timeStartedRolling;
-        float percentageComplete = timeSinceStarted / 0.75f;
+        player.PCAnimator.ResetTrigger("Roll");
 
-        Vector3 newPos = Vector3.Lerp(startPosition, endPosition, percentageComplete);
-
-        player.transform.position = newPos;
-
-        if(percentageComplete >= 1.0f)
+        if (PCStateController.InputDirection == Vector3.zero)
         {
-            rollingState = RollingState.init;
-            player.PCController.enabled = true;
-          
-
-            if (PCStateController.InputDirection == Vector3.zero)
-            {
-                ToIdleState();
-                player.PCAnimator.SetTrigger("Idle");
-            }
-            else
-            {
-                ToWalkState();
-                //player.PCAnimator.SetTrigger("Walk");
-
-            }
+            ToIdleState();
         }
-        
+        else
+        {
+            ToWalkState();           
+        }
+
+
+        rollingState = RollingState.init;
     }
 
     
