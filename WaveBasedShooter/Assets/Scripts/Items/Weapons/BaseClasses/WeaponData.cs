@@ -26,6 +26,16 @@ public class WeaponData : ScriptableObject
     }
 
     [SerializeField]
+    private Sprite weaponIcon;
+    public Sprite WeaponIcon
+    {
+        get
+        {
+            return weaponIcon;
+        }
+    }
+
+    [SerializeField]
     private GameObject weaponPrefab;
     public GameObject WeaponPrefab
     {
@@ -45,13 +55,34 @@ public class WeaponData : ScriptableObject
         }
     }
 
+    [Header("Sprint Attack Attributes")]
     [SerializeField]
-    private float[] damageInflicted;
-    public float[] DamageInflicted
+    private float sprintAttackDamage;
+    public float SprintAttackDamage
     {
         get
         {
-            return damageInflicted;
+            return sprintAttackDamage;
+        }
+    }
+
+    private float sprintAttackStaminaCost;
+    public float SprintAttackStaminaCost
+    {
+        get
+        {
+            return sprintAttackDamage;
+        }
+    }
+
+    [Header("Standard Attack Attributes")]
+    [SerializeField]
+    private float[] standardAttackDamage;
+    public float[] StandardAttackDamage
+    {
+        get
+        {
+            return standardAttackDamage;
         }
     }
 }
