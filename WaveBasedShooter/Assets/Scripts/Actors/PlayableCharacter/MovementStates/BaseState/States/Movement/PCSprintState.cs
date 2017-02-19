@@ -30,6 +30,27 @@ public class PCSprintState : IPlayableCharacterState
         }
         else
         {
+            //Check for Attack
+            if(player.IsAttacking)
+            {
+                //Check If We've Got Enough Stamina
+                if(PCAttributes.Instance.CheckIfPCHasEnoughStamina(player.CurrentWeapon.SprintAttackStaminaCost))
+                {
+                    //Check How Many Hands
+                    if(player.CurrentWeapon.WeaponType == WeaponType.Type.SingleHanded)
+                    {
+                        player.PCAnimator.SetBool("isSingleHandedWeapon", true);
+                    }
+                    else
+                    {
+                        player.PCAnimator.SetBool("isDoubleHandedWeapon", true);
+                    }
+
+                    player.PCAnimator.SetBool("isAttacking", true);
+                }
+                
+            }
+            
             //Check for Movement
             if (player.MovementVector != Vector3.zero)
             {
@@ -46,8 +67,7 @@ public class PCSprintState : IPlayableCharacterState
                         //Check that we're not currently rolling
                         AnimatorStateInfo currentState = player.PCAnimator.GetCurrentAnimatorStateInfo(0);
 
-                        if (currentState.fullPathHash != Animator.StringToHash("Base Layer.SlowRoll") && currentState.fullPathHash != Animator.StringToHash("Base Layer.FastRoll"))
-                            player.transform.rotation = Quaternion.LookRotation(player.MovementVector);
+                       player.transform.rotation = Quaternion.LookRotation(player.MovementVector);
                     }
                     else
                     {

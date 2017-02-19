@@ -6,6 +6,7 @@ public class WeaponType
 {
     public enum Type
     {
+        Fists,
         SingleHanded,
         DoubleHanded,
     }

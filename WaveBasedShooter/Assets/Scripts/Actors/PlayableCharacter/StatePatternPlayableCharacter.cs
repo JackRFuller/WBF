@@ -43,6 +43,55 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
         }
     }
 
+    //Weapons========================================================================
+    [Header("Weapons")]
+    [SerializeField]
+    private WeaponData startingWeapon;
+    private WeaponData currentWeapon;
+    public WeaponData CurrentWeapon
+    {
+        get
+        {
+            return currentWeapon;
+        }
+    }
+    private static WeaponPickup weaponPickup;
+    public static WeaponPickup WeaponPickUp
+    {
+        get
+        {
+            return weaponPickup;
+        }
+        set
+        {
+            weaponPickup = value;
+        }
+    }
+
+    [Header("Shields")]
+    [SerializeField]
+    private GameObject shieldObject;
+    private static ShieldHandler shield;
+    public static ShieldHandler Shield
+    {
+        get
+        {
+            return shield;
+        }
+        set
+        {
+            shield = value;
+        }
+    }
+    private bool hasShield;
+    public bool HasShield
+    {
+        get
+        {
+            return hasShield;
+        }
+    }
+
     //States=========================================================================
 
     //Core States
@@ -96,6 +145,15 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
         }
     }
 
+    private bool isAttacking;
+    public bool IsAttacking
+    {
+        get
+        {
+            return isAttacking;
+        }
+    }
+
     private void Start()
     {
         pcAnimator = this.GetComponent<Animator>();
@@ -107,8 +165,54 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
         slowRollState = new PCSlowRollState(this);
         fastRollState = new PCFastRollState(this);
 
+        //Weapon
+        GetWeapon();
+
         //Set Starting State
         currentState = idleState;
+    }
+    /// <summary>
+    /// Pickups Shield
+    /// Shield Variable is set in ShieldHandler
+    /// </summary>
+    void SetShield()
+    {
+        shield.PickUpItem();
+        
+        hasShield = true;
+        pcAnimator.SetBool("hasShield", true);
+
+        shieldObject.SetActive(true);
+
+        shield = null;
+    }
+    
+    void GetWeapon()
+    {
+        //currentWeapon = we;        
+
+        switch(currentWeapon.WeaponType)
+        {
+            case WeaponType.Type.Fists:
+                pcAnimator.SetBool("hasWeapon", false);
+                pcAnimator.SetBool("isSingleHandedWeapon", false);
+                pcAnimator.SetBool("isDoubleHandedWeapon", false);
+                break;
+
+            case WeaponType.Type.SingleHanded:
+                pcAnimator.SetBool("hasWeapon", true);
+                pcAnimator.SetBool("isSingleHandedWeapon", true);
+                pcAnimator.SetBool("isDoubleHandedWeapon", false);
+                Debug.Log("Picked up Single Handed Weapon");
+                break;
+
+            case WeaponType.Type.DoubleHanded:
+                pcAnimator.SetBool("hasWeapon", true);
+                pcAnimator.SetBool("isSingleHandedWeapon", false);
+                pcAnimator.SetBool("isDoubleHandedWeapon", true);
+                Debug.Log("Picked up Double Handed Weapon");
+                break;
+        }
     }
 
     public override void UpdateNormal()
@@ -137,6 +241,30 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
 
     private void GetInputs()
     {
+        //PickUp
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            if (shield)
+                SetShield();
+
+            
+        }
+
+
+        //Get Combat Input & Check We're not Rolling
+        if(!isRolling)
+        {
+            if(Input.GetMouseButton(0))
+            {
+                isAttacking = true;
+            }
+            else
+            {
+                isAttacking = false;
+            }
+        }
+       
+
         //Get Roll Input
         if(Input.GetKeyDown(KeyCode.Space))
         {
