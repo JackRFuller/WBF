@@ -166,7 +166,7 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
         fastRollState = new PCFastRollState(this);
 
         //Weapon
-        GetWeapon();
+        //GetWeapon();
 
         //Set Starting State
         currentState = idleState;
@@ -235,7 +235,8 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
         }
         else
         {
-            currentState.OnUpdateState();
+            if(currentState != null)
+                currentState.OnUpdateState();
         }
     }
 
