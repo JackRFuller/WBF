@@ -28,6 +28,12 @@ public class PCIdleState : IPlayableCharacterState
             }
         }
 
+        //Check for Attack
+        if(player.IsTryingToAttack)
+        {
+			OnExitState(player.standardAttackState);
+        }
+
         //Check for Movement
         if(player.MovementVector != Vector3.zero)
         {

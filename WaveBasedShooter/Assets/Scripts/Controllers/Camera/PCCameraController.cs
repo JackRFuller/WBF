@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PCCameraController : BaseMonoBehaviour
 {
+	[SerializeField]
+	private StatePatternPlayableCharacter player;
+
     public Collider target;
     public Vector3 focusAreaSize;
     private FocusArea focusArea;
@@ -47,7 +50,7 @@ public class PCCameraController : BaseMonoBehaviour
         {
             lookAheadDirX = Mathf.Sign(focusArea.velocity.x);
 
-            if(Mathf.Sign(PCStateController.InputDirection.x) == Mathf.Sign(focusArea.velocity.x) && PCStateController.InputDirection.x != 0)
+			if(Mathf.Sign(player.MovementVector.x) == Mathf.Sign(focusArea.velocity.x) && player.MovementVector.x != 0)
             {
                 lookAheadStoppedX = false;
                 targetLookAheadX = lookAheadDirX * lookAheadDst;
@@ -67,7 +70,7 @@ public class PCCameraController : BaseMonoBehaviour
         {
             lookAheadDirZ = Mathf.Sign(focusArea.velocity.z);
 
-            if (Mathf.Sign(PCStateController.InputDirection.z) == Mathf.Sign(focusArea.velocity.z) && PCStateController.InputDirection.z != 0)
+			if (Mathf.Sign(player.MovementVector.z) == Mathf.Sign(focusArea.velocity.z) && player.MovementVector.z != 0)
             {
                 lookAheadStoppedZ = false;
                 targetLookAheadZ = lookAheadDirZ * lookAheadDst;

@@ -47,6 +47,8 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
     [Header("Weapons")]
     [SerializeField]
     private WeaponData startingWeapon;
+    [SerializeField]
+    private GameObject[] weapons;
     private WeaponData currentWeapon;
     public WeaponData CurrentWeapon
     {
@@ -109,12 +111,15 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
     }
     private IPlayableCharacterState lastState;
 
-    //States
+    //States - Movement
     [HideInInspector] public PCIdleState idleState;
     [HideInInspector] public PCWalkState walkState;
     [HideInInspector] public PCSprintState sprintState;
     [HideInInspector] public PCSlowRollState slowRollState;
     [HideInInspector] public PCFastRollState fastRollState;
+
+	//States - Weapon
+	[HideInInspector] public PCStandardAttackState standardAttackState;
 
     //Inputs =========================================================================
     //Movement
@@ -145,12 +150,12 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
         }
     }
 
-    private bool isAttacking;
-    public bool IsAttacking
+    private bool isTryingToAttack;
+    public bool IsTryingToAttack
     {
         get
         {
-            return isAttacking;
+            return isTryingToAttack;
         }
     }
 
@@ -158,19 +163,62 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
     {
         pcAnimator = this.GetComponent<Animator>();
 
-        //Get States
+        //Get States - Movement
         idleState = new PCIdleState(this);
         walkState = new PCWalkState(this);
         sprintState = new PCSprintState(this);
         slowRollState = new PCSlowRollState(this);
         fastRollState = new PCFastRollState(this);
 
-        //Weapon
-        //GetWeapon();
-
+		//Get States - Combat
+		standardAttackState = new PCStandardAttackState(this);
+        
         //Set Starting State
         currentState = idleState;
+
+		OverrideAnimationClips(startingWeapon);
     }
+
+   
+
+    //Takes New Weapon and Sets Up New Animations
+    private void OverrideAnimationClips(WeaponData newWeapon)
+    {
+        Animator animator = GetComponent<Animator>();
+
+        AnimatorOverrideController overrideController = new AnimatorOverrideController();
+        overrideController.runtimeAnimatorController = GetEffectiveController(animator);
+
+        //Set Up New Animation Clips - Movement
+		overrideController["Idle"] = newWeapon.MovementAnimation.idleAnim.clip;
+		overrideController["Jog"] = newWeapon.MovementAnimation.walkAnim.clip;
+		overrideController["Sprint"] = newWeapon.MovementAnimation.runAnim.clip;
+		overrideController["SlowRoll"] = newWeapon.MovementAnimation.slowRollAnim.clip;
+		overrideController["FastRoll"] = newWeapon.MovementAnimation.fastRollAnim.clip;
+
+		//Set up New Animation Clips - Weapons
+		overrideController["Attack1"] = newWeapon.WeaponAnimation.attackOneAnim.clip;
+		overrideController["Attack2"] = newWeapon.WeaponAnimation.attackTwoAnim.clip;
+		overrideController["Attack3"] = newWeapon.WeaponAnimation.attackThreeAnim.clip;
+
+        animator.runtimeAnimatorController = overrideController;        
+    }
+
+    //Create New Animator
+    private RuntimeAnimatorController GetEffectiveController(Animator animator)
+    {
+        RuntimeAnimatorController controller = animator.runtimeAnimatorController;
+
+        AnimatorOverrideController overrideController = controller as AnimatorOverrideController;
+        while (overrideController != null)
+        {
+            controller = overrideController.runtimeAnimatorController;
+            overrideController = controller as AnimatorOverrideController;
+        }
+
+        return controller;
+    }
+
     /// <summary>
     /// Pickups Shield
     /// Shield Variable is set in ShieldHandler
@@ -189,30 +237,15 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
     
     void GetWeapon()
     {
-        //currentWeapon = we;        
+        currentWeapon = weaponPickup.Weapon;
+        
+        weaponPickup.GetWeapon();
 
-        switch(currentWeapon.WeaponType)
-        {
-            case WeaponType.Type.Fists:
-                pcAnimator.SetBool("hasWeapon", false);
-                pcAnimator.SetBool("isSingleHandedWeapon", false);
-                pcAnimator.SetBool("isDoubleHandedWeapon", false);
-                break;
+        weapons[weaponPickup.WeaponIndex].SetActive(true);
 
-            case WeaponType.Type.SingleHanded:
-                pcAnimator.SetBool("hasWeapon", true);
-                pcAnimator.SetBool("isSingleHandedWeapon", true);
-                pcAnimator.SetBool("isDoubleHandedWeapon", false);
-                Debug.Log("Picked up Single Handed Weapon");
-                break;
+		OverrideAnimationClips(currentWeapon);
 
-            case WeaponType.Type.DoubleHanded:
-                pcAnimator.SetBool("hasWeapon", true);
-                pcAnimator.SetBool("isSingleHandedWeapon", false);
-                pcAnimator.SetBool("isDoubleHandedWeapon", true);
-                Debug.Log("Picked up Double Handed Weapon");
-                break;
-        }
+        weaponPickup = null;
     }
 
     public override void UpdateNormal()
@@ -224,20 +257,28 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
 
     private void UpdateCurrentState()
     {
-        if(lastState != currentState)
-        {
-            if (lastState != null)
-                lastState.OnUpdateState();
+		if(currentState != lastState)
+		{
+			currentState.OnEnterState();
 
-            lastState = currentState;
+			lastState = currentState;
+		}
+		else
+		{
+			if(currentState != null)
+				currentState.OnUpdateState();
+		}
 
-            Debug.Log(currentState);
-        }
-        else
-        {
-            if(currentState != null)
-                currentState.OnUpdateState();
-        }
+//        if(lastState != currentState)
+//        {
+//            if (lastState != null)
+//                lastState.OnUpdateState();
+//
+//            lastState = currentState;
+//
+//            Debug.Log(currentState);
+//        }
+        
     }
 
     private void GetInputs()
@@ -248,7 +289,8 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
             if (shield)
                 SetShield();
 
-            
+            if (weaponPickup)
+                GetWeapon();
         }
 
 
@@ -257,11 +299,11 @@ public class StatePatternPlayableCharacter : BaseMonoBehaviour
         {
             if(Input.GetMouseButton(0))
             {
-                isAttacking = true;
+                isTryingToAttack = true;
             }
             else
             {
-                isAttacking = false;
+                isTryingToAttack = false;
             }
         }
        

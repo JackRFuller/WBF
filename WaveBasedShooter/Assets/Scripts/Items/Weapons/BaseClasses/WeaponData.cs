@@ -6,14 +6,15 @@ using UnityEngine;
 public class WeaponData : ScriptableObject
 {
     [SerializeField]
-    private string weaponName;
-    public string WeaponName
+    private WeaponType.Name weaponName;
+    public WeaponType.Name WeaponName
     {
         get
         {
             return weaponName;
         }
     }
+
 
     [SerializeField]
     private WeaponType.Type weaponType;
@@ -25,6 +26,7 @@ public class WeaponData : ScriptableObject
         }
     }
 
+   
     [SerializeField]
     private Sprite weaponIcon;
     public Sprite WeaponIcon
@@ -53,7 +55,29 @@ public class WeaponData : ScriptableObject
         {
             return maxWeaponHealth;
         }
-    }
+    }    
+
+	[Header("Movement Animations")]
+	[SerializeField]
+	private MovementAnimations movementAnimation;
+	public MovementAnimations MovementAnimation
+	{
+		get
+		{
+			return movementAnimation;
+		}
+	}
+
+	[Header("Weapon Animations")]
+	[SerializeField]
+	private WeaponAnimations weaponAnimation;
+	public WeaponAnimations WeaponAnimation
+	{
+		get
+		{
+			return weaponAnimation;	
+		}
+	}
 
     [Header("Sprint Attack Attributes")]
     [SerializeField]
@@ -83,6 +107,15 @@ public class WeaponData : ScriptableObject
         get
         {
             return standardAttackDamage;
+        }
+    }
+    [SerializeField]
+    private float[] standardAttackStaminaCosts;
+    public float[] StandardAttackStaminaCosts
+    {
+        get
+        {
+            return standardAttackStaminaCosts;
         }
     }
 }

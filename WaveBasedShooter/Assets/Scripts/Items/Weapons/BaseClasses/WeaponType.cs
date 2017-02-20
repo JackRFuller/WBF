@@ -10,4 +10,15 @@ public class WeaponType
         SingleHanded,
         DoubleHanded,
     }
+
+
+    public enum Name
+    {
+        Fist,
+        Sword,
+        Axe,
+        GreatAxe,
+        Scythe,
+        Pitchfork,
+    }
 }

@@ -31,7 +31,7 @@ public class PCSprintState : IPlayableCharacterState
         else
         {
             //Check for Attack
-            if(player.IsAttacking)
+            if(player.IsTryingToAttack)
             {
                 //Check If We've Got Enough Stamina
                 if(PCAttributes.Instance.CheckIfPCHasEnoughStamina(player.CurrentWeapon.SprintAttackStaminaCost))
